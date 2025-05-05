@@ -21,6 +21,8 @@ DB_NAME = os.getenv("VECTOR_DB_NAME")
 class PrepareDocumentsFolder:
     def __init__(self,folders):
         self.folders = folders
+        self.chunk_size = int
+        self.chunk_overlap = int
         self.text_loader_kwargs = {'encoding': 'utf-8'}
         self.documents = []
         self.doc_type = ""
@@ -29,7 +31,7 @@ class PrepareDocumentsFolder:
         self.folder_docs = []
         
 
-    def create_chunks(self):
+    def create_chunks(self,chunk_size=1000,chunk_overlap=200):
         
         if not self.folders:
             raise ValueError("No folders specified: please set path to folder with directories to be prepared.")
@@ -52,7 +54,7 @@ class PrepareDocumentsFolder:
                 doc.metadata["doc_type"] = self.doc_type
                 self.documents.append(doc)    
 
-        text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        text_splitter = CharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
         self.chunks = text_splitter.split_documents(self.documents)
         self.doc_types = set(chunk.metadata['doc_type'] for chunk in self.chunks)
         logger.info(f"Document types found: {', '.join(self.doc_types)}") 
